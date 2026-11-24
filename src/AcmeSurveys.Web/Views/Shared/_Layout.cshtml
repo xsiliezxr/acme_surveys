@@ -1,0 +1,62 @@
+@using AcmeSurveys.Web.Controllers
+@{
+    var isAuthenticated = Request.IsAuthenticated;
+    var successMessage = TempData[AppControllerBase.SuccessMessageKey] as string;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>@ViewBag.Title · Acme Surveys</title>
+    <link rel="stylesheet" href="~/Content/lib/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/Content/site.css" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <a class="visually-hidden-focusable" href="#main">Saltar al contenido</a>
+
+    <nav class="navbar navbar-expand-md navbar-dark acme-navbar">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" href="@(isAuthenticated ? Url.Action("Index", "Surveys") : "#")">Acme Surveys</a>
+            @if (isAuthenticated)
+            {
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Mostrar menú">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">@Html.ActionLink("Mis encuestas", "Index", "Surveys", null, new { @class = "nav-link" })</li>
+                        <li class="nav-item">@Html.ActionLink("Nueva encuesta", "Create", "Surveys", null, new { @class = "nav-link" })</li>
+                    </ul>
+                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-flex align-items-center gap-3" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <span class="navbar-text small">@User.Identity.Name</span>
+                        <button type="submit" class="btn btn-sm btn-outline-light">Cerrar sesión</button>
+                    }
+                </div>
+            }
+        </div>
+    </nav>
+
+    <main id="main" class="container py-4 flex-grow-1">
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="status">
+                @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="py-3 text-center text-muted small border-top">
+        Acme Surveys · Información cifrada en reposo
+    </footer>
+
+    <script src="~/Scripts/lib/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="~/Scripts/site.js"></script>
+</body>
+</html>

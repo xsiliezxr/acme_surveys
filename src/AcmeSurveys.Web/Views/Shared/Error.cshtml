@@ -1,0 +1,12 @@
+@{
+    ViewBag.Title = "Error";
+    var correlationId = ViewData["CorrelationId"] as string;
+}
+<div class="acme-status-page">
+    <h1 class="h3">Ocurrió un error inesperado</h1>
+    <p class="text-muted">No se mostró ningún detalle técnico por seguridad. Intente de nuevo en unos minutos.</p>
+    @if (!string.IsNullOrEmpty(correlationId))
+    {
+        <p class="small text-muted">Código de referencia para soporte: <code>@correlationId</code></p>
+    }
+</div>

@@ -1,0 +1,53 @@
+:root {
+    --acme-brand: #1f3a5f;
+    --acme-brand-accent: #2f6fb0;
+}
+
+body {
+    background-color: #f5f7fa;
+}
+
+.acme-navbar {
+    background-color: var(--acme-brand);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--acme-brand-accent);
+    --bs-btn-border-color: var(--acme-brand-accent);
+    --bs-btn-hover-bg: var(--acme-brand);
+    --bs-btn-hover-border-color: var(--acme-brand);
+}
+
+.acme-status-page {
+    max-width: 36rem;
+    margin: 3rem auto;
+    text-align: center;
+}
+
+.acme-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.acme-prewrap {
+    white-space: pre-wrap;
+}
+
+.acme-prewrap,
+.acme-cell {
+    word-break: break-word;
+}
+
+.acme-cell {
+    max-width: 24rem;
+}
+
+.acme-field-row {
+    border-left: 3px solid var(--acme-brand-accent);
+}
+
+.field-validation-error {
+    display: block;
+}
