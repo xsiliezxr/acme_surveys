@@ -1,0 +1,70 @@
+@using System.Globalization
+@using AcmeSurveys.Application.Abstractions.Persistence
+@model IReadOnlyList<SurveySummary>
+@{
+    ViewBag.Title = "Mis encuestas";
+    var culture = CultureInfo.CurrentCulture;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Mis encuestas</h1>
+    @Html.ActionLink("+ Nueva encuesta", "Create", null, new { @class = "btn btn-primary" })
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <p class="lead mb-1">Aún no tiene encuestas.</p>
+            <p class="text-muted">Cree la primera y comparta su link para empezar a recibir respuestas.</p>
+            @Html.ActionLink("Crear encuesta", "Create", null, new { @class = "btn btn-primary" })
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var survey in Model)
+        {
+            var publicUrl = PublicLinks.ForToken(Request.Url, survey.PublicToken);
+            var linkInputId = "link-" + survey.ExternalId.ToString("N");
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between gap-2">
+                            <div>
+                                <h2 class="h5 mb-1">@survey.Name</h2>
+                                @if (!string.IsNullOrEmpty(survey.Description))
+                                {
+                                    <p class="text-muted mb-2 acme-clamp">@survey.Description</p>
+                                }
+                                <p class="small text-muted mb-0">
+                                    @survey.FieldCount campo(s) · <strong>@survey.ResponseCount.ToString("N0", culture)</strong> respuesta(s) ·
+                                    actualizada @ValueFormatter.FormatUtc(survey.UpdatedAtUtc, culture)
+                                </p>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 align-items-start">
+                                @Html.ActionLink("Resultados", "Results", new { id = survey.ExternalId }, new { @class = "btn btn-sm btn-primary" })
+                                @Html.ActionLink("Editar", "Edit", new { id = survey.ExternalId }, new { @class = "btn btn-sm btn-outline-secondary" })
+                                @Html.ActionLink("Eliminar", "Delete", new { id = survey.ExternalId }, new { @class = "btn btn-sm btn-outline-danger" })
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label small mb-1" for="@linkInputId">Link público para llenar la encuesta</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control font-monospace" id="@linkInputId" value="@publicUrl" readonly />
+                                <button type="button" class="btn btn-outline-secondary" data-copy-target="@linkInputId">Copiar</button>
+                                <a class="btn btn-outline-secondary" href="@publicUrl" target="_blank" rel="noopener noreferrer">Abrir</a>
+                            </div>
+                            @using (Html.BeginForm("RotateLink", "Surveys", new { id = survey.ExternalId }, FormMethod.Post, new { @class = "mt-1" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none">Regenerar link (invalida el actual)</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
