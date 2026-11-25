@@ -95,8 +95,36 @@
         });
     }
 
+    // La CSP no permite onclick/onsubmit inline: confirmaciones y bloqueo de doble envío van por atributos data-*.
+    function initForms() {
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            var question = form.getAttribute('data-confirm');
+            if (question && !window.confirm(question)) {
+                event.preventDefault();
+                return;
+            }
+            var busyText = form.getAttribute('data-submit-once');
+            if (busyText) {
+                form.querySelectorAll('button[type="submit"]').forEach(function (button) {
+                    button.setAttribute('data-idle-text', button.textContent);
+                    button.disabled = true;
+                    button.textContent = busyText;
+                });
+            }
+        });
+        // Al volver con Atrás, el navegador puede restaurar la página con el botón aún deshabilitado.
+        window.addEventListener('pageshow', function () {
+            document.querySelectorAll('button[data-idle-text]').forEach(function (button) {
+                button.disabled = false;
+                button.textContent = button.getAttribute('data-idle-text');
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         initFieldEditor();
         initCopyButtons();
+        initForms();
     });
 })();
