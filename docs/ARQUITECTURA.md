@@ -65,6 +65,8 @@ sequenceDiagram
 | Tabla `Users` propia | ASP.NET Identity 2 | Identity usa PBKDF2-SHA1 con 1000 iteraciones y agrega 5 tablas |
 | Cookie (web) + JWT (API) | Solo JWT | Un JWT en `localStorage` queda expuesto a XSS |
 | Sin Session State | Session en proceso | Sin estado en el servidor; TempData va en cookie cifrada |
+| PBKDF2 con CNG (`BCryptDeriveKeyPBKDF2`) | `Rfc2898DeriveBytes` | La versión gestionada de .NET Framework es ~10× más lenta; el hash es idéntico |
+| Campos identificados por `name` en la API | Exponer el id interno del campo | La API nunca expone ids internos; el nombre ya es único por encuesta |
 | Rate limit propio en OWIN | Paquete de terceros | No hay paquete mantenido para OWIN 4; en la nube se delegaría al WAF |
 | Capas internas SDK-style `net48` | `.csproj` clásicos | `PackageReference` y `dotnet build`; el proyecto web sigue clásico por las herramientas de MVC 5 |
 | Swashbuckle.Core + swagger-ui 5 local | UI embebida de Swashbuckle | La UI embebida es swagger-ui 2.x, con XSS conocidos; la 5.x local cumple la CSP |
