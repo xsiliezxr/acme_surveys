@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -37,13 +38,25 @@ namespace AcmeSurveys.Web.Api.Controllers
             Content(status, new ApiError(error, message));
 
         /// <summary>Traduce un Result fallido a la respuesta HTTP adecuada.</summary>
-        protected IHttpActionResult FromFailure(Result result)
+        /// <param name="result">Resultado fallido del caso de uso.</param>
+        /// <param name="targetMap">Convierte el target del dominio en la ruta del dato en el JSON.</param>
+        protected IHttpActionResult FromFailure(Result result, Func<string, string> targetMap = null)
         {
             if (result.HasError(ErrorCodes.NotFound))
                 return Problem(HttpStatusCode.NotFound, ErrorCodes.NotFound, result.Errors[0].Message);
             if (result.HasError(ErrorCodes.Conflict))
                 return Problem(HttpStatusCode.Conflict, ErrorCodes.Conflict, result.Errors[0].Message);
-            return Problem(HttpStatusCode.BadRequest, ErrorCodes.Validation, result.Errors[0].Message);
+
+            var map = targetMap ?? ToCamelCasePath;
+            var details = result.Errors.Select(e => new ApiFieldError(map(e.Target ?? string.Empty), e.Message)).ToList();
+            return Content(HttpStatusCode.BadRequest, new ApiError(ErrorCodes.Validation, "Los datos enviados no son válidos.", details));
+        }
+
+        /// <summary>"Fields[0].Name" del dominio pasa a "fields[0].name", igual que el JSON en camelCase.</summary>
+        private static string ToCamelCasePath(string target)
+        {
+            if (string.IsNullOrEmpty(target)) return string.Empty;
+            return string.Join(".", target.Split('.').Select(s => s.Length == 0 ? s : char.ToLowerInvariant(s[0]) + s.Substring(1)));
         }
     }
 }

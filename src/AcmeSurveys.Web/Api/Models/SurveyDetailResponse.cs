@@ -19,6 +19,9 @@ namespace AcmeSurveys.Web.Api.Models
         /// <summary>Si ya tiene respuestas, no se pueden cambiar tipos ni eliminar campos.</summary>
         public bool HasResponses { get; set; }
 
+        /// <summary>Token de concurrencia (base64). Se reenvía tal cual en el PUT.</summary>
+        public string RowVersion { get; set; }
+
         /// <summary>Campos en el orden en que se muestran.</summary>
         public IReadOnlyList<SurveyFieldResponse> Fields { get; set; }
     }

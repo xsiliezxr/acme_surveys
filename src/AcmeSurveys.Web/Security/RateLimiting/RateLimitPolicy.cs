@@ -31,6 +31,7 @@ namespace AcmeSurveys.Web.Security.RateLimiting
             new RateLimitPolicy("login",         "POST", "/account/login",      5,   TimeSpan.FromMinutes(1)),
             new RateLimitPolicy("api-token",     "POST", "/api/v1/auth/token",  5,   TimeSpan.FromMinutes(1)),
             new RateLimitPolicy("public-submit", "POST", "/s",                  10,  TimeSpan.FromMinutes(1)),
+            new RateLimitPolicy("api-submit",    "POST", "/api/v1/public",      10,  TimeSpan.FromMinutes(1)),
             new RateLimitPolicy("api",           null,   "/api",                60,  TimeSpan.FromMinutes(1)),
             new RateLimitPolicy("global",        null,   null,                  300, TimeSpan.FromMinutes(1))
         };
