@@ -1,4 +1,4 @@
-@model SurveyFormViewModel
+﻿@model SurveyFormViewModel
 @{
     ViewBag.Title = Model.IsEdit ? "Editar encuesta" : "Nueva encuesta";
     var action = Model.IsEdit ? Url.Action("Edit", new { id = Model.ExternalId }) : Url.Action("Create");
