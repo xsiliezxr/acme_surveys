@@ -51,7 +51,7 @@ namespace AcmeSurveys.Web
         protected void Application_BeginRequest()
         {
             if (Interlocked.Exchange(ref _urlsAnnounced, 1) == 0)
-                AnnounceUrls(Request.Url.GetLeftPart(UriPartial.Authority), AppSettings.Current.SwaggerEnabled);
+                AnnounceUrls("https://" + Request.Url.Host + ":" + AppSettings.Current.HttpsPort, AppSettings.Current.SwaggerEnabled);
         }
 
         protected void Application_Error(object sender, EventArgs e)
@@ -67,6 +67,7 @@ namespace AcmeSurveys.Web
         {
             var message = new StringBuilder()
                 .AppendLine("Acme Surveys escuchando en " + baseUrl + "/")
+                .AppendLine("  Login:      " + baseUrl + "/account/login")
                 .AppendLine("  API REST:   " + baseUrl + "/api/v1");
             if (swaggerEnabled)
             {

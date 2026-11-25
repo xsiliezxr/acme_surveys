@@ -28,6 +28,6 @@ dotnet_naming_style.underscore_prefix.capitalization = camel_case
 # Usings sin uso: el IDE los marca y `dotnet format` los elimina.
 dotnet_diagnostic.IDE0005.severity = suggestion
 
-# Windows PowerShell 5.1 lee los .ps1 sin BOM como ANSI (los acentos salen corruptos).
-[*.ps1]
+# PowerShell 5.1 y el compilador de vistas de ASP.NET leen como ANSI los archivos sin BOM.
+[*.{ps1,cshtml}]
 charset = utf-8-bom
