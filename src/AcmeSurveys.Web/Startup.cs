@@ -22,7 +22,8 @@ namespace AcmeSurveys.Web
         {
             var settings = AppSettings.Current;
 
-            // Orden: rate limit (antes de gastar CPU/BD) -> HSTS -> autenticación por cookie.
+            // Orden: HTTPS -> rate limit (antes de gastar CPU/BD) -> HSTS -> autenticación por cookie.
+            app.Use<HttpsRedirectionMiddleware>(settings.HttpsPort);
             app.Use<RateLimitMiddleware>(RateLimitPolicy.Defaults, new SlidingWindowRateLimiter());
             app.Use<HstsMiddleware>();
 

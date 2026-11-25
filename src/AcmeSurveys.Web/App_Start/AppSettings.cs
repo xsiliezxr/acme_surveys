@@ -29,6 +29,7 @@ namespace AcmeSurveys.Web
         public TimeSpan SessionAbsoluteTimeout { get; private set; }
 
         public bool SwaggerEnabled { get; private set; }
+        public int HttpsPort { get; private set; }
 
         private static AppSettings Load()
         {
@@ -51,7 +52,8 @@ namespace AcmeSurveys.Web
                     TimeSpan.FromMinutes(GetInt("Lockout:DurationMinutes", 15))),
                 SessionIdleTimeout = TimeSpan.FromMinutes(GetInt("Session:IdleTimeoutMinutes", 30)),
                 SessionAbsoluteTimeout = TimeSpan.FromHours(GetInt("Session:AbsoluteTimeoutHours", 8)),
-                SwaggerEnabled = GetBool("Swagger:Enabled", false)
+                SwaggerEnabled = GetBool("Swagger:Enabled", false),
+                HttpsPort = GetInt("HttpsPort", 443)
             };
         }
 

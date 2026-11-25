@@ -1,18 +1,20 @@
 ﻿<#
 .SYNOPSIS
-    Levanta el sitio en IIS Express por HTTPS (puerto 44385, con certificado de desarrollo) sin abrir Visual Studio. Requiere compilar antes.
+    Levanta el sitio en IIS Express sin abrir Visual Studio: HTTPS en 44385 (certificado de desarrollo) y HTTP en 5080, que redirige a HTTPS. Requiere compilar antes.
 .EXAMPLE
-    powershell -ExecutionPolicy Bypass -File tools\Start-WebApp.ps1
+    powershell -ExecutionPolicy Bypass -File tools\Start-WebApp.ps1 [-Port 44385] [-HttpPort 5080]
 #>
 [CmdletBinding()]
 param(
-    [int] $Port = 44385
+    [int] $Port = 44385,
+    [int] $HttpPort = 5080
 )
 
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..')
 $sitePath = Join-Path $root 'src\AcmeSurveys.Web'
 $iisExpressDir = Join-Path $env:ProgramFiles 'IIS Express'
+$appcmd = Join-Path $iisExpressDir 'appcmd.exe'
 $configDir = Join-Path $root '.vs\config'
 $configFile = Join-Path $configDir 'applicationhost.config'
 $siteName = 'AcmeSurveys.Web'
@@ -27,14 +29,19 @@ if (-not (Test-Path (Join-Path $sitePath 'bin\AcmeSurveys.Web.dll'))) {
 if (-not (Test-Path $configFile)) {
     New-Item -ItemType Directory -Force -Path $configDir | Out-Null
     Copy-Item (Join-Path $iisExpressDir 'config\templates\PersonalWebServer\applicationhost.config') $configFile
-    $appcmd = Join-Path $iisExpressDir 'appcmd.exe'
     & $appcmd add site /name:$siteName "/bindings:https/*:${Port}:localhost" "/physicalPath:$sitePath" "/apphostconfig:$configFile" | Out-Null
     & $appcmd set app "$siteName/" /applicationPool:Clr4IntegratedAppPool "/apphostconfig:$configFile" | Out-Null
 }
 
+$bindings = & $appcmd list site $siteName /text:bindings "/apphostconfig:$configFile"
+if ($bindings -notmatch "http/\*:${HttpPort}:localhost") {
+    & $appcmd set site $siteName "/+bindings.[protocol='http',bindingInformation='*:${HttpPort}:localhost']" "/apphostconfig:$configFile" | Out-Null
+}
+
 $baseUrl = "https://localhost:$Port"
 Write-Host ''
-Write-Host "  Aplicación: $baseUrl/" -ForegroundColor Green
+Write-Host "  Login:      $baseUrl/account/login" -ForegroundColor Green
+Write-Host "  Aplicación: $baseUrl/  (http://localhost:$HttpPort redirige a HTTPS)" -ForegroundColor Green
 Write-Host "  Swagger UI: $baseUrl/swagger" -ForegroundColor Green
 Write-Host "  OpenAPI:    $baseUrl/swagger/docs/v1" -ForegroundColor Green
 Write-Host "  API REST:   $baseUrl/api/v1" -ForegroundColor Green
