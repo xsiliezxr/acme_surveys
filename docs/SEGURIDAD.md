@@ -6,7 +6,7 @@ Se guarda un hash lento con sal, nunca la contraseña ni un valor reversible.
 
 | Parámetro | Valor |
 |---|---|
-| Algoritmo | PBKDF2-HMAC-SHA256 (`Rfc2898DeriveBytes`, NIST SP 800-132, sin dependencias externas) |
+| Algoritmo | PBKDF2-HMAC-SHA256 (NIST SP 800-132) con la API nativa de Windows `BCryptDeriveKeyPBKDF2` |
 | Iteraciones | 600 000 (recomendación OWASP), guardadas por usuario |
 | Sal | 16 bytes de CSPRNG por usuario |
 | Comparación | Tiempo constante |
@@ -16,6 +16,8 @@ Se guarda un hash lento con sal, nunca la contraseña ni un valor reversible.
   mensaje con el mismo costo de CPU.
 - **Bloqueo:** 5 fallos bloquean 15 minutos. El contador se actualiza con un `UPDATE … OUTPUT` atómico.
 - **Límites de entrada:** usuario de 50 caracteres y contraseña de 128 como máximo (evita DoS sobre PBKDF2).
+- **CNG en lugar de `Rfc2898DeriveBytes`:** en .NET Framework la clase es gestionada y tarda ~1,2 s por login con
+  600 000 iteraciones; CNG tarda ~0,12 s y produce el mismo hash (lo comprueba una prueba unitaria).
 
 ## Cifrado de respuestas
 
@@ -54,6 +56,12 @@ usaría el login de `database/03_least_privilege_login.sql`.
 El JWT valida firma, algoritmo exacto `HS256`, emisor, audiencia y expiración, con un tamaño máximo de 4 KB. En cada
 petición se comprueba que el usuario siga activo.
 
+## HTTPS
+
+- La web por HTTP responde `301` (GET/HEAD) o `308` (resto de verbos, conserva método y cuerpo) hacia HTTPS.
+- La API por HTTP no se redirige: responde `403 https_required`, porque el token ya habría viajado en claro.
+- HSTS en las respuestas HTTPS y cookies `Secure` con prefijo `__Host-`.
+
 ## Rate limiting
 
 *Sliding window counter* en un middleware OWIN. Responde 429 con `Retry-After`.
@@ -61,7 +69,7 @@ petición se comprueba que el usuario siga activo.
 | Ruta | Límite por IP |
 |---|---|
 | `POST /account/login`, `POST /api/v1/auth/token` | 5 / min |
-| `POST /s/*` | 10 / min |
+| `POST /s/*`, `POST /api/v1/public/*` | 10 / min |
 | `/api/*` | 60 / min |
 | Global | 300 / min |
 
@@ -72,7 +80,7 @@ El contador vive en memoria (por instancia); con varios servidores se movería a
 | Riesgo | Controles |
 |---|---|
 | A01 Broken Access Control | `[Authorize]` global; verificación de dueño con 404 para recursos ajenos; UUID no enumerables |
-| A02 Security Misconfiguration | `customErrors On`, sin cabeceras de versión, solo GET/HEAD/POST, CSP estricta, HSTS, sin CORS, Swagger apagado en Release |
+| A02 Security Misconfiguration | `customErrors On`, sin cabeceras de versión, solo GET/HEAD/POST/PUT/DELETE, CSP estricta, HSTS, sin CORS, Swagger apagado en Release |
 | A03 Supply Chain | Versiones fijadas, NuGetAudit activo, librerías de cliente locales, dependencias mínimas |
 | A04 Cryptographic Failures | PBKDF2, AES+HMAC, claves de 256 bits fuera del repositorio, TLS obligatorio |
 | A05 Injection | SQL parametrizado, Razor codifica la salida, nombres de campo validados en dominio y en BD |
