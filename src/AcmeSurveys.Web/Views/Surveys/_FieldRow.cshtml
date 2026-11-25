@@ -1,0 +1,59 @@
+@model FieldRowViewModel
+@{
+    var field = Model.Field;
+    var types = new[] { FieldType.Text, FieldType.Number, FieldType.Date };
+}
+<div class="card mb-2 acme-field-row" data-field-row>
+    <div class="card-body py-3">
+        <input type="hidden" name="@Model.NameFor("Id")" value="@Model.IdValue" />
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small mb-1" for="@Model.IdFor("Name")">Nombre del campo</label>
+                <input type="text" class="form-control form-control-sm font-monospace" id="@Model.IdFor("Name")" name="@Model.NameFor("Name")"
+                       value="@field.Name" required maxlength="@SurveyRules.FieldNameMaxLength" pattern="@SurveyRules.FieldNamePattern.Trim('^', '$')"
+                       placeholder="ej. edad" autocomplete="off" spellcheck="false" />
+                @Html.ValidationMessage(Model.NameFor("Name"), new { @class = "text-danger small" })
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small mb-1" for="@Model.IdFor("Title")">Título (se muestra al encuestado)</label>
+                <input type="text" class="form-control form-control-sm" id="@Model.IdFor("Title")" name="@Model.NameFor("Title")"
+                       value="@field.Title" required maxlength="@SurveyRules.FieldTitleMaxLength" placeholder="ej. ¿Cuál es tu edad?" />
+                @Html.ValidationMessage(Model.NameFor("Title"), new { @class = "text-danger small" })
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="@Model.IdFor("Type")">Tipo</label>
+                @if (Model.IsStructureLocked)
+                {
+
+                    <input type="hidden" name="@Model.NameFor("Type")" value="@field.Type" />
+                }
+                <select class="form-select form-select-sm" id="@Model.IdFor("Type")" name="@(Model.IsStructureLocked ? null : Model.NameFor("Type"))"
+                        disabled="@Model.IsStructureLocked">
+                    @foreach (var type in types)
+                    {
+                        <option value="@type" selected="@(type == field.Type)">@ValueFormatter.DisplayName(type)</option>
+                    }
+                </select>
+                @Html.ValidationMessage(Model.NameFor("Type"), new { @class = "text-danger small" })
+            </div>
+            <div class="col-6 col-md-1">
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox" id="@Model.IdFor("IsRequired")" name="@Model.NameFor("IsRequired")"
+                           value="true" checked="@field.IsRequired" />
+                    <input type="hidden" name="@Model.NameFor("IsRequired")" value="false" />
+                    <label class="form-check-label small" for="@Model.IdFor("IsRequired")">Requerido</label>
+                </div>
+            </div>
+            <div class="col-md-2 text-md-end">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Acciones del campo">
+                    <button type="button" class="btn btn-outline-secondary" data-move-up title="Subir" aria-label="Subir campo">&uarr;</button>
+                    <button type="button" class="btn btn-outline-secondary" data-move-down title="Bajar" aria-label="Bajar campo">&darr;</button>
+                    @if (!Model.IsStructureLocked)
+                    {
+                        <button type="button" class="btn btn-outline-danger" data-remove-field title="Eliminar" aria-label="Eliminar campo">&times;</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
