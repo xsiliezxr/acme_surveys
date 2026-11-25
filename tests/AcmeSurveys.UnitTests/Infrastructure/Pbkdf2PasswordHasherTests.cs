@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using AcmeSurveys.Application.Abstractions.Security;
 using AcmeSurveys.Domain.Users;
 using AcmeSurveys.Infrastructure.Security;
@@ -53,6 +54,21 @@ namespace AcmeSurveys.UnitTests.Infrastructure
             var result = stronger.Verify(Password, hash);
 
             Assert.Equal(PasswordVerificationResult.SuccessRehashNeeded, result);
+        }
+
+        [Fact]
+        public void DeriveSha256_NativeImplementation_MatchesRfc2898DeriveBytes()
+        {
+            var salt = Enumerable.Range(1, Pbkdf2PasswordHasher.SaltSize).Select(i => (byte)i).ToArray();
+            byte[] expected;
+            using (var managed = new Rfc2898DeriveBytes(Password, salt, Pbkdf2PasswordHasher.MinimumIterations, HashAlgorithmName.SHA256))
+            {
+                expected = managed.GetBytes(Pbkdf2PasswordHasher.HashSize);
+            }
+
+            var actual = NativePbkdf2.DeriveSha256(Password, salt, Pbkdf2PasswordHasher.MinimumIterations, Pbkdf2PasswordHasher.HashSize);
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]

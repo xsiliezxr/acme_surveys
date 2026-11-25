@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography;
 using AcmeSurveys.Application.Abstractions.Security;
 using AcmeSurveys.Domain.Users;
 
@@ -13,7 +12,7 @@ namespace AcmeSurveys.Infrastructure.Security
         public const int MinimumIterations = 100000;
 
         private readonly int _iterations;
-        private readonly Lazy<PasswordHash> _dummyHash;
+        private readonly PasswordHash _dummyHash;
 
         public Pbkdf2PasswordHasher(int iterations = DefaultIterations)
         {
@@ -21,7 +20,7 @@ namespace AcmeSurveys.Infrastructure.Security
                 throw new ArgumentOutOfRangeException(nameof(iterations), "PBKDF2 iterations below the secure minimum.");
 
             _iterations = iterations;
-            _dummyHash = new Lazy<PasswordHash>(() => Hash(Guid.NewGuid().ToString("N")));
+            _dummyHash = Hash(Guid.NewGuid().ToString("N"));
         }
 
         public PasswordHash Hash(string password)
@@ -48,16 +47,10 @@ namespace AcmeSurveys.Infrastructure.Security
         // Mismo costo de CPU cuando el usuario no existe: evita enumerar usuarios por tiempo de respuesta.
         public void SimulateVerification(string password)
         {
-            var dummy = _dummyHash.Value;
-            Derive(password ?? string.Empty, dummy.Salt, dummy.Iterations);
+            Derive(password ?? string.Empty, _dummyHash.Salt, _dummyHash.Iterations);
         }
 
-        private static byte[] Derive(string password, byte[] salt, int iterations)
-        {
-            using (var kdf = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256))
-            {
-                return kdf.GetBytes(HashSize);
-            }
-        }
+        private static byte[] Derive(string password, byte[] salt, int iterations) =>
+            NativePbkdf2.DeriveSha256(password, salt, iterations, HashSize);
     }
 }
