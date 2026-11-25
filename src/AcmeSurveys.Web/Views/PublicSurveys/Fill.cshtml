@@ -1,0 +1,59 @@
+﻿@model FillSurveyViewModel
+@{
+    ViewBag.Title = Model.Survey.Name;
+}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h3">@Model.Survey.Name</h1>
+                @if (!string.IsNullOrEmpty(Model.Survey.Description))
+                {
+                    <p class="text-muted acme-prewrap">@Model.Survey.Description</p>
+                }
+                <p class="small text-muted">Los campos marcados con <span class="text-danger">*</span> son obligatorios.</p>
+
+                @using (Html.BeginForm("Fill", "PublicSurveys", new { token = Model.Survey.PublicToken }, FormMethod.Post, new { data_submit_once = "Enviando…" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, null, new { @class = "alert alert-danger", role = "alert" })
+
+                    foreach (var field in Model.Survey.Fields)
+                    {
+                        var inputName = FillSurveyViewModel.InputPrefix + field.Name;
+                        var inputId = "f_" + field.Name;
+                        var hasError = !ViewData.ModelState.IsValidField(inputName);
+                        <div class="mb-3">
+                            <label class="form-label" for="@inputId">
+                                @field.Title
+                                @if (field.IsRequired)
+                                {
+                                    <span class="text-danger" aria-hidden="true">*</span>
+                                }
+                            </label>
+                            @switch (field.Type)
+                            {
+                                case FieldType.Number:
+                                    <input type="number" step="any" inputmode="decimal" class="form-control @(hasError ? "is-invalid" : null)"
+                                           id="@inputId" name="@inputName" value="@Model.ValueFor(field.Name)" required="@field.IsRequired" />
+                                    break;
+                                case FieldType.Date:
+                                    <input type="date" min="1900-01-01" max="2100-12-31" class="form-control @(hasError ? "is-invalid" : null)"
+                                           id="@inputId" name="@inputName" value="@Model.ValueFor(field.Name)" required="@field.IsRequired" />
+                                    break;
+                                default:
+                                    <input type="text" maxlength="@AcmeSurveys.Domain.FieldValues.TextFieldHandler.MaxLength" class="form-control @(hasError ? "is-invalid" : null)"
+                                           id="@inputId" name="@inputName" value="@Model.ValueFor(field.Name)" required="@field.IsRequired" />
+                                    break;
+                            }
+                            @Html.ValidationMessage(inputName, new { @class = "invalid-feedback d-block" })
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-primary px-4">Enviar respuestas</button>
+                }
+            </div>
+        </div>
+        <p class="text-center small text-muted mt-3">Sus respuestas se almacenan cifradas.</p>
+    </div>
+</div>

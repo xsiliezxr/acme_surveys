@@ -1,0 +1,18 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>API · Acme Surveys</title>
+    <link rel="stylesheet" href="~/Content/lib/swagger-ui/swagger-ui.css" />
+</head>
+<body>
+    <div id="swagger-ui" data-spec-url="@Url.Content("~/" + AcmeSurveys.Web.SwaggerConfig.DocumentPath)"></div>
+    <script src="~/Scripts/lib/swagger-ui/swagger-ui-bundle.js"></script>
+    <script src="~/Scripts/api-docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Build y editor
+.vs/
+bin/
+obj/
+packages/
+*.user
+*.suo
+*.cache
+TestResults/
+*.log
+.iisexpress/
+
+# Secretos (se generan con tools/New-DevSecrets.ps1)
+src/AcmeSurveys.Web/secrets.config
+
+# Logs locales
+src/AcmeSurveys.Web/App_Data/logs/
+
+# Documentos de la prueba
+*.pdf

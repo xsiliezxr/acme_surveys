@@ -1,0 +1,30 @@
+﻿@model LoginViewModel
+@{
+    ViewBag.Title = "Iniciar sesión";
+}
+<div class="row justify-content-center">
+    <div class="col-sm-10 col-md-6 col-lg-4">
+        <div class="card shadow-sm acme-login-card">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-1">Iniciar sesión</h1>
+                <p class="text-muted small mb-4">Acceda para crear encuestas y consultar sus resultados.</p>
+                @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.ReturnUrl)
+                    @Html.ValidationSummary(true, null, new { @class = "alert alert-danger py-2", role = "alert" })
+
+                    <div class="mb-3">
+                        <label for="Username" class="form-label">Usuario</label>
+                        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", autocomplete = "username", required = "required", maxlength = "50", autofocus = "autofocus" })
+                    </div>
+                    <div class="mb-4">
+                        <label for="Password" class="form-label">Contraseña</label>
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "current-password", required = "required", maxlength = "128" })
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
