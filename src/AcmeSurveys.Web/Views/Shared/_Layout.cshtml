@@ -2,6 +2,10 @@
 @{
     var isAuthenticated = Request.IsAuthenticated;
     var successMessage = TempData[AppControllerBase.SuccessMessageKey] as string;
+    var currentController = ViewContext.RouteData.Values["controller"] as string;
+    var currentAction = ViewContext.RouteData.Values["action"] as string;
+    var onCreate = currentController == "Surveys" && currentAction == "Create";
+    var onSurveys = currentController == "Surveys" && !onCreate;
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -12,6 +16,7 @@
     <title>@ViewBag.Title · Acme Surveys</title>
     <link rel="stylesheet" href="~/Content/lib/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="~/Content/site.css" />
+    <link rel="icon" type="image/svg+xml" href="~/Content/favicon.svg" />
 </head>
 <body class="d-flex flex-column min-vh-100">
     <a class="visually-hidden-focusable" href="#main">Saltar al contenido</a>
@@ -27,8 +32,16 @@
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">@Html.ActionLink("Mis encuestas", "Index", "Surveys", null, new { @class = "nav-link" })</li>
-                        <li class="nav-item">@Html.ActionLink("Nueva encuesta", "Create", "Surveys", null, new { @class = "nav-link" })</li>
+                        <li class="nav-item">
+                            <a class="nav-link @(onSurveys ? "active" : null)" href="@Url.Action("Index", "Surveys")" aria-current="@(onSurveys ? "page" : null)">Mis encuestas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(onCreate ? "active" : null)" href="@Url.Action("Create", "Surveys")" aria-current="@(onCreate ? "page" : null)">Nueva encuesta</a>
+                        </li>
+                        @if (AppSettings.Current.SwaggerEnabled)
+                        {
+                            <li class="nav-item"><a class="nav-link" href="~/swagger">API</a></li>
+                        }
                     </ul>
                     @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-flex align-items-center gap-3" }))
                     {

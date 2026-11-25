@@ -32,14 +32,16 @@ else
                     <div class="card-body">
                         <div class="d-flex flex-wrap justify-content-between gap-2">
                             <div>
-                                <h2 class="h5 mb-1">@survey.Name</h2>
+                                <h2 class="h5 mb-1">
+                                    @survey.Name
+                                    <span class="badge rounded-pill @(survey.ResponseCount > 0 ? "text-bg-success" : "text-bg-light border") align-middle ms-1">@survey.ResponseCount.ToString("N0", culture) respuesta(s)</span>
+                                </h2>
                                 @if (!string.IsNullOrEmpty(survey.Description))
                                 {
                                     <p class="text-muted mb-2 acme-clamp">@survey.Description</p>
                                 }
                                 <p class="small text-muted mb-0">
-                                    @survey.FieldCount campo(s) · <strong>@survey.ResponseCount.ToString("N0", culture)</strong> respuesta(s) ·
-                                    actualizada @ValueFormatter.FormatUtc(survey.UpdatedAtUtc, culture)
+                                    @survey.FieldCount campo(s) · actualizada @ValueFormatter.FormatUtc(survey.UpdatedAtUtc, culture)
                                 </p>
                             </div>
                             <div class="d-flex flex-wrap gap-2 align-items-start">
@@ -56,7 +58,8 @@ else
                                 <button type="button" class="btn btn-outline-secondary" data-copy-target="@linkInputId">Copiar</button>
                                 <a class="btn btn-outline-secondary" href="@publicUrl" target="_blank" rel="noopener noreferrer">Abrir</a>
                             </div>
-                            @using (Html.BeginForm("RotateLink", "Surveys", new { id = survey.ExternalId }, FormMethod.Post, new { @class = "mt-1" }))
+                            @using (Html.BeginForm("RotateLink", "Surveys", new { id = survey.ExternalId }, FormMethod.Post,
+                                new { @class = "mt-1", data_confirm = "El link actual dejará de funcionar para quienes ya lo tienen. ¿Generar uno nuevo?" }))
                             {
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none">Regenerar link (invalida el actual)</button>

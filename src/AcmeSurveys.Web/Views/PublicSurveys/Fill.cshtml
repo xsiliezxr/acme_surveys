@@ -13,7 +13,7 @@
                 }
                 <p class="small text-muted">Los campos marcados con <span class="text-danger">*</span> son obligatorios.</p>
 
-                @using (Html.BeginForm("Fill", "PublicSurveys", new { token = Model.Survey.PublicToken }, FormMethod.Post))
+                @using (Html.BeginForm("Fill", "PublicSurveys", new { token = Model.Survey.PublicToken }, FormMethod.Post, new { data_submit_once = "Enviando…" }))
                 {
                     @Html.AntiForgeryToken()
                     @Html.ValidationSummary(true, null, new { @class = "alert alert-danger", role = "alert" })
@@ -50,7 +50,7 @@
                         </div>
                     }
 
-                    <button type="submit" class="btn btn-primary">Enviar respuestas</button>
+                    <button type="submit" class="btn btn-primary px-4">Enviar respuestas</button>
                 }
             </div>
         </div>

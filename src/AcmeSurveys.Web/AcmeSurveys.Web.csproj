@@ -90,6 +90,7 @@
     <Content Include="Views\**\*.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Content\**\*.css" />
+    <Content Include="Content\**\*.svg" />
     <Content Include="Scripts\**\*.js" />
     <None Include="Scripts\lib\**\LICENSE*;Scripts\lib\**\NOTICE" />
     <None Include="secrets.config.example" />
