@@ -35,12 +35,9 @@
                         <li class="nav-item">
                             <a class="nav-link @(onSurveys ? "active" : null)" href="@Url.Action("Index", "Surveys")" aria-current="@(onSurveys ? "page" : null)">Mis encuestas</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(onCreate ? "active" : null)" href="@Url.Action("Create", "Surveys")" aria-current="@(onCreate ? "page" : null)">Nueva encuesta</a>
-                        </li>
                         @if (AppSettings.Current.SwaggerEnabled)
                         {
-                            <li class="nav-item"><a class="nav-link" href="~/swagger">API</a></li>
+                            <li class="nav-item"><a class="nav-link" href="~/swagger">Documentación API</a></li>
                         }
                     </ul>
                     @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-flex align-items-center gap-3" }))
@@ -66,7 +63,8 @@
     </main>
 
     <footer class="py-3 text-center text-muted small border-top">
-        Acme Surveys · Información cifrada en reposo
+        Acme Surveys · Tu información está segura con nosotros 
+        · ©Angel Siliezar 2026
     </footer>
 
     <script src="~/Scripts/lib/bootstrap/bootstrap.bundle.min.js"></script>

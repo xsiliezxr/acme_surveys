@@ -40,9 +40,15 @@ powershell -ExecutionPolicy Bypass -File tools\New-DevSecrets.ps1
 powershell -ExecutionPolicy Bypass -File tools\Initialize-Database.ps1
 
 # 3a. Visual Studio: abrir AcmeSurveys.sln y presionar F5
-# 3b. Terminal: compilar y levantar IIS Express
+
+# 3b. Terminal (PowerShell estándar): ubica MSBuild automáticamente, compila y levanta IIS Express
+
 & "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" AcmeSurveys.sln -restore
 powershell -ExecutionPolicy Bypass -File tools\Start-WebApp.ps1
+
+# 3c. Si el comando anterior lanza error es porque no encuentra el MSBuild.exe
+$msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
+& $msbuild AcmeSurveys.sln -restore
 ```
 
 | URL | Contenido |
